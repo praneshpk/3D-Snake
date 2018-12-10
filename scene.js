@@ -4,7 +4,6 @@ const FOOD_COLOR = [0xd7871f,0xc8b57a,0xd59a07,0xd7871f,0xc8b57a,0xd59a07];
 const SNAKE_COLOR = [0xa81760,0x68961c,0xdc9960,0xc892f8,0xb02e7c,0xef4f1a];
 const SNAKE_COLOR_ALT = [0x57E89F,0x9769E3,0x23669F,0x376D07,0x4FD183,0x10B0E5];
 
-
 var now;
 var then = Date.now();
 var interval = 1000 / FPS;
@@ -25,10 +24,8 @@ var sfx = {
     collide: new Audio('audio/obstacle.mp3')
 };
 
-
 scene = new THREE.Scene();
 scene.background = new THREE.Color( 0xf5f2d0 );
-
 
 var camera = new THREE.PerspectiveCamera(
     45, window.innerWidth / window.innerHeight, 1, 10000);
@@ -39,7 +36,6 @@ camera.rotation.z = 0;
 renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
 
 var plane = new THREE.Mesh(
     new THREE.PlaneGeometry(PLANE_DIM[0], PLANE_DIM[1], 0),
@@ -114,8 +110,6 @@ var move = function(e, opponent) {
     }   
 }
 
-
-
 var update = function() {
     for(var i = 0; i < players.length; i++) {
         if(!players[i].wait) {
@@ -167,7 +161,6 @@ var update = function() {
 
 var render = function() {
     camera.position.set(0, -PLANE_DIM[0], PLANE_DIM[0]);
-
     renderer.render(scene, camera);
 };
 
@@ -185,9 +178,6 @@ var GameLoop = function() {
 }
 GameLoop();
 
-document.onkeydown = function(e) {
-    
-}
 var cpu = function(e) {
     if(!start) {
         start = true;
@@ -283,7 +273,6 @@ var vs = function(e) {
     //           `;
     //         break;
     // }
-
 }
 
 document.getElementById('vs').onclick = function () {
@@ -312,6 +301,4 @@ document.getElementById('cpu').onclick = function () {
         `;
         document.onkeydown = cpu;
     }
-
-    
 };
