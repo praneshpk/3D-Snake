@@ -10,7 +10,8 @@ Multiplayer snake game created using Three.js
 ### To-do
 - [ ] Improve CPU AI
 - [ ] Allow returning to the main menu
-- [ ] Add more player support / play over the network
+- [ ] Add 2+ player support / play over the network
 - [ ] Add powerups
+- [ ] Add high score table
 
 Live: https://praneshpk.github.io/3D-Snake/
