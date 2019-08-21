@@ -10,7 +10,8 @@ Multiplayer snake game created using Three.js
 ### To-do
 - [ ] Improve CPU AI
 - [x] Allow returning to the main menu
-- [x] Add 2+ player support / play over the network
+- [x] Add pause
+- [] Add 2+ player support / play over the network
 - [ ] Add powerups
 - [ ] Add high score table
 
