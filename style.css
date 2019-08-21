@@ -36,7 +36,9 @@ canvas {
     background-color:rgb(170,175,163);
     opacity: 0.95;
 }
-
+.cpu, .vs {
+    display: none;
+}
 .btn {
     display:block;
     font-size: 20pt;
@@ -50,6 +52,7 @@ canvas {
 
 h1, h2, h3, h4, h6 {
     font-weight: normal;
+    margin: 0;
     /* font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; */
     
 }

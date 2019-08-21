@@ -6,14 +6,27 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/99/three.min.js"></script>
   </head>
   <body>
-    <ul class="static">
-      
-    </ul>
+    <ul class="static"></ul>
     <div class="dialog">
-      <h1>SNAKE!</h1>
-      <p>Choose a game mode</p>
-      <span class="btn" id="vs">P1 v P2</span>
-      <span class="btn" id="cpu">P1 v CPU</span>
+      <div class="menu">
+        <h1>SNAKE!</h1>
+        <p>Choose a game mode</p>
+        <span class="btn" id="vs">P1 v P2</span>
+        <span class="btn" id="cpu">P1 v CPU</span>
+      </div>
+      <div class="vs">
+        <h1>Controls</h1>
+          <p>Player 1 (Purple) => Arrow Keys</p>
+          <p>Player 2 (Green) => WASD</p>
+          <p>Spacebar to pause, ESC to main menu</p>
+          <p>Press any key to begin the countdown</p>
+      </div>
+      <div class="cpu">
+        <h1>Controls</h1>
+          <p>Use the arrow keys to move. You are purple.</p>
+          <p>Spacebar to pause, ESC to main menu</p>
+          <p>Press any key to start the game</p>
+      </div>
     </div>
 
     <script type="text/javascript" src="snake.js"></script>

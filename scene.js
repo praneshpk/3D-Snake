@@ -3,6 +3,11 @@ const FPS = 20;
 const FOOD_COLOR = [0xd7871f,0xc8b57a,0xd59a07,0xd7871f,0xc8b57a,0xd59a07];
 const SNAKE_COLOR = [0xa81760,0x68961c,0xdc9960,0xc892f8,0xb02e7c,0xef4f1a];
 const SNAKE_COLOR_ALT = [0x57E89F,0x9769E3,0x23669F,0x376D07,0x4FD183,0x10B0E5];
+const P1_CTRL = [37, 38, 39, 40]; // Arrow keys
+const P2_CTRL = [65, 87, 68, 83]; // WASD
+
+const dialog = document.querySelector('.dialog');
+const menu = dialog.querySelector('.menu');
 
 var now;
 var then = Date.now();
@@ -10,6 +15,7 @@ var interval = 1000 / FPS;
 var delta;
 var animate;
 var start = false;
+var paused = false;
 var cpu = true;
 
 var bgm = new Audio('audio/bgm.mp3');
@@ -94,6 +100,60 @@ scene.add(food);
 scene.add(plane);
 scene.add(light);
 
+var control = function(key, player, ctrl = P1_CTRL) {
+    switch(key) {
+        case ctrl[0]:
+            if(player.dir[0] == 0)
+                player.dir = [-1, 0, 0];
+            break;
+        case ctrl[1]:
+            if(player.dir[1] == 0)
+                player.dir = [0, 1, 0];
+            break;
+        case ctrl[2]:
+            if(players[0].dir[0] == 0)
+                player.dir = [1, 0, 0];
+            break;
+        case ctrl[3]:
+            if(players[0].dir[1] == 0)
+                player.dir = [0, -1, 0];
+            break;
+    }
+}
+
+var reset = function(pid) {
+    border[0].material.color.setHex(0xbdbdbd);
+    border[1].material.color.setHex(0xbdbdbd);
+    border[2].material.color.setHex(0xd3d3d3);
+    border[3].material.color.setHex(0xd3d3d3);
+    players[pid].body.forEach(function(e) {
+                scene.remove(e);
+    });
+    players[pid] = new Snake(pid * -40, players[pid].palette);
+    players[pid].body.forEach(function(e) {
+        scene.add(e);
+    });
+}
+
+var sys_ctrl = function(key) {
+    switch(key) {
+        case 32:
+            paused = !paused;
+            break;
+        case 27:
+            paused = false;
+            start = false;
+            dialog.style.display = "block";
+            dialog.querySelector('.menu').style.display = "block";
+            dialog.querySelector('.vs').style.display = "none";
+            dialog.querySelector('.cpu').style.display = "none";
+            document.onkeydown = null;
+            reset(0);
+            reset(1);
+            break;
+    }
+}
+
 var move = function(e, opponent) {
     e.move(opponent);
 
@@ -114,38 +174,12 @@ var update = function() {
     for(var i = 0; i < players.length; i++) {
         if(!players[i].wait) {
             if(cpu && i == 1) {
-                switch(Math.floor(Math.random() * 4) + 36)  {
-                    case 37:
-                        if(players[i].dir[0] == 0)
-                            players[i].dir = [-1, 0, 0];
-                        break;
-                    case 38:
-                        if(players[i].dir[1] == 0)
-                            players[i].dir = [0, 1, 0];
-                        break;
-                    case 39:
-                        if(players[i].dir[0] == 0)
-                            players[i].dir = [1, 0, 0];
-                        break;
-                    case 40:
-                        if(players[i].dir[1] == 0)
-                            players[i].dir = [0, -1, 0];
-                        break;
-                }
+                control(Math.floor(Math.random() * 4) + 36, players[i]);
             }
             move(players[i],players[Math.abs(i-1)]);
         } else if(players[i].timeout-- <= 0) {
-            border[0].material.color.setHex(0xbdbdbd);
-            border[1].material.color.setHex(0xbdbdbd);
-            border[2].material.color.setHex(0xd3d3d3);
-            border[3].material.color.setHex(0xd3d3d3);
-            players[i].body.forEach(function(e) {
-                scene.remove(e);
-            });
-            players[i] = new Snake(i * -40, players[i].palette);
-            players[i].body.forEach(function(e) {
-                scene.add(e);
-            });
+            
+            reset(i);
         }
     }
     var p1 = document.getElementById('score-0');
@@ -171,121 +205,59 @@ var GameLoop = function() {
     delta = now - then;
     if(delta > interval) {
         then = now - (delta % interval);
-        if(start) 
+        if(start && !paused) 
             update();
         render();
     }
 }
 GameLoop();
 
-var cpu = function(e) {
+var cpu_game = function(e) {
     if(!start) {
         start = true;
-        document.querySelector('.dialog').style.display = "none";
+        dialog.style.display = "none";
         document.querySelector('.static').innerHTML = `
             <li>Your Score: <span id="score-0"></span></li>
             <li>Computer's Score: <span id="score-1"></span></li>
         `;
+    } else {
+        sys_ctrl(e.keyCode);
     }
     if(!players[0].wait)
-        switch(e.keyCode) {
-            case 37:
-                if(players[0].dir[0] == 0)
-                    players[0].dir = [-1, 0, 0];
-                break;
-            case 38:
-                if(players[0].dir[1] == 0)
-                    players[0].dir = [0, 1, 0];
-                break;
-            case 39:
-                if(players[0].dir[0] == 0)
-                    players[0].dir = [1, 0, 0];
-                break;
-            case 40:
-                if(players[0].dir[1] == 0)
-                    players[0].dir = [0, -1, 0];
-                break;
-        }
+        control(e.keyCode, players[0]);
 
 }
 
-var vs = function(e) {
+var vs_game = function(e) {
     if(!start) {
         start = true;
-        document.querySelector('.dialog').style.display = "none";
+        dialog.style.display = "none";
         document.querySelector('.static').innerHTML = `
             <li>Purple Score: <span id="score-0"></span></li>
             <li>Green Score: <span id="score-1"></span></li>
         `;
         players[0].wait = true;
         players[1].wait = true;
+        e.keyCode = null;
+    } else {
+        sys_ctrl(e.keyCode);
     }
     if(!players[0].wait)
-        switch(e.keyCode) {
-            case 37:
-                if(players[0].dir[0] == 0)
-                    players[0].dir = [-1, 0, 0];
-                break;
-            case 38:
-                if(players[0].dir[1] == 0)
-                    players[0].dir = [0, 1, 0];
-                break;
-            case 39:
-                if(players[0].dir[0] == 0)
-                    players[0].dir = [1, 0, 0];
-                break;
-            case 40:
-                if(players[0].dir[1] == 0)
-                    players[0].dir = [0, -1, 0];
-                break;
-        }
+        control(e.keyCode, players[0]);
 
     if(!players[1].wait)
-        switch(e.keyCode) {
-            case 65:
-                if(players[1].dir[0] == 0)
-                    players[1].dir = [-1, 0, 0];
-                break;
-            case 87:
-                if(players[1].dir[1] == 0)
-                    players[1].dir = [0, 1, 0];
-                break;
-            case 68:
-                if(players[1].dir[0] == 0)
-                    players[1].dir = [1, 0, 0];
-                break;
-            case 83:
-                if(players[1].dir[1] == 0)
-                    players[1].dir = [0, -1, 0];
-                break;
-        }
+        control(e.keyCode, players[1], P2_CTRL);
 
-    // switch(e.keyCode) {
-    //     case 27:
-    //         start = false;
-    //         var dialog = document.querySelector('.dialog');
-    //         dialog.style.display = "block";
-    //         dialog.innerHTML = `
-    //           <h1>SNAKE!</h1>
-    //           <p>Choose a game mode</p>
-    //           <span class="btn" id="vs">P1 v P2</span>
-    //           <span class="btn" id="cpu">P1 v CPU</span>
-    //           `;
-    //         break;
-    // }
 }
 
 document.getElementById('vs').onclick = function () {
     if(!start) {
         bgm.play();
-        document.querySelector('.dialog').innerHTML = `
-        <h1>Controls</h1>
-        <p>Player 1 (Purple) => Arrow Keys</p>
-        <p>Player 2 (Green) => WASD</p>
-        <p>Press any key to begin the countdown</p>
-        `;
+        dialog.querySelector('.menu').style.display = "none";
+        dialog.querySelector('.cpu').style.display = "none";
+        dialog.querySelector('.vs').style.display = "block";
         cpu = false;
-        document.onkeydown = vs;
+        document.onkeydown = vs_game;
     }
     
 };
@@ -293,12 +265,10 @@ document.getElementById('vs').onclick = function () {
 document.getElementById('cpu').onclick = function () {
     if(!start) {
         bgm.play();
-
-        document.querySelector('.dialog').innerHTML = `
-        <h1>Controls</h1>
-        <p>Use the arrow keys to move. You are purple.</p>
-        <p>Press any key to start the game</p>
-        `;
-        document.onkeydown = cpu;
+        dialog.querySelector('.menu').style.display = "none";
+        dialog.querySelector('.cpu').style.display = "block";
+        dialog.querySelector('.vs').style.display = "none";
+        cpu = true;
+        document.onkeydown = cpu_game;
     }
 };
